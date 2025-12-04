@@ -1,22 +1,28 @@
 // --- 元素選擇器 ---
-const ghost = document.getElementById('ghost');
-const peppa = document.getElementById('peppa');
+const player = document.getElementById('peppa'); // 主角現在是 peppa
+const obstacle = document.getElementById('ghost'); // 障礙物現在是 ghost
 const scoreDisplay = document.getElementById('score');
 const gameOverMessage = document.getElementById('game-over-message');
 const finalScore = document.getElementById('final-score');
+const gameContainer = document.getElementById('game-container');
 
 // --- 遊戲狀態變數 ---
-let isJumping = false;
 let isGameOver = true;
 let score = 0;
 let timerInterval;
 let gameLoopInterval;
 
-// --- 遊戲設定 ---
-const jumpHeight = 120; // 幽靈跳躍的最大高度 (px)
-const gravity = 0.5;    // 重力加速度
-let velocityY = 0;      // 垂直速度
-const groundLevel = 0;  // 地面位置 (bottom: 0px)
+// --- 物理和移動設定 ---
+const groundLevel = 0;      // 地面位置 (bottom: 0px)
+const jumpVelocity = 15;    // 初始跳躍速度
+const gravity = 1;          // 重力加速度
+const moveSpeed = 5;        // 左右移動速度
+
+let posX = 50;              // 主角水平位置 (left)
+let velocityY = 0;          // 主角垂直速度
+let isMovingLeft = false;   // 是否按住左鍵
+let isMovingRight = false;  // 是否按住右鍵
+
 
 // --- 遊戲開始/重新開始函數 ---
 function startGame() {
@@ -26,12 +32,15 @@ function startGame() {
     scoreDisplay.textContent = '時間: 0s';
     gameOverMessage.classList.add('hidden');
 
-    // 重設幽靈位置
-    ghost.style.bottom = `${groundLevel}px`;
+    // 重設主角位置
+    posX = 50;
+    velocityY = 0;
+    player.style.left = `${posX}px`;
+    player.style.bottom = `${groundLevel}px`;
     
-    // 重設佩佩豬位置 (隱藏)
-    peppa.style.right = '-60px'; 
-    peppa.style.display = 'block';
+    // 重設障礙物位置 (隱藏)
+    obstacle.style.right = '-60px'; 
+    obstacle.style.display = 'block';
 
     // 開始計時器
     timerInterval = setInterval(() => {
@@ -43,76 +52,96 @@ function startGame() {
     gameLoopInterval = setInterval(gameLoop, 20); // 每20毫秒更新一次 (50 FPS)
 
     // 隨機生成障礙物
-    setTimeout(spawnPeppa, Math.random() * 2000 + 1000); // 1到3秒後出現第一個
+    setTimeout(spawnObstacle, Math.random() * 2000 + 1000); 
 }
 
 // --- 跳躍函數 ---
 function jump() {
-    if (isJumping || isGameOver) return;
-
-    isJumping = true;
-    ghost.style.bottom = `${jumpHeight}px`; // 立即跳到最高點
-
-    // 這裡使用CSS動畫來視覺化跳躍
-    ghost.classList.add('jump'); 
-
-    // 0.5秒後動畫結束，回到地面
-    setTimeout(() => {
-        ghost.classList.remove('jump');
-        ghost.style.bottom = `${groundLevel}px`;
-        isJumping = false;
-    }, 500);
+    // 只有當主角在地面時才能跳躍 (垂直速度為0)
+    if (parseInt(player.style.bottom) === groundLevel && !isGameOver) {
+        velocityY = jumpVelocity;
+    }
 }
 
+// --- 物理更新 (重力與跳躍) ---
+function applyPhysics() {
+    let currentBottom = parseInt(player.style.bottom);
+
+    // 應用重力
+    velocityY -= gravity;
+    currentBottom += velocityY;
+
+    // 檢查是否落地
+    if (currentBottom <= groundLevel) {
+        currentBottom = groundLevel;
+        velocityY = 0;
+    }
+
+    player.style.bottom = `${currentBottom}px`;
+}
+
+// --- 水平移動更新 ---
+function applyMovement() {
+    let containerWidth = gameContainer.offsetWidth;
+    const playerWidth = 60; 
+
+    if (isMovingLeft) {
+        posX -= moveSpeed;
+    }
+    if (isMovingRight) {
+        posX += moveSpeed;
+    }
+
+    // 邊界檢查
+    if (posX < 0) {
+        posX = 0;
+    } else if (posX > containerWidth - playerWidth) {
+        posX = containerWidth - playerWidth;
+    }
+
+    player.style.left = `${posX}px`;
+}
+
+
 // --- 障礙物生成和移動 ---
-function spawnPeppa() {
+function spawnObstacle() {
     if (isGameOver) return;
     
-    // 初始位置：右邊界外
-    let peppaRight = -60;
-    const peppaSpeed = 5; // 障礙物移動速度 (px/frame)
+    let obstacleRight = -60;
+    const obstacleSpeed = 5; 
 
-    peppa.style.right = `${peppaRight}px`;
+    obstacle.style.right = `${obstacleRight}px`;
     
-    const movePeppa = () => {
+    const moveObstacle = () => {
         if (isGameOver) return;
 
-        peppaRight += peppaSpeed;
-        peppa.style.right = `${peppaRight}px`;
+        obstacleRight += obstacleSpeed;
+        obstacle.style.right = `${obstacleRight}px`;
 
-        // 障礙物超出左邊界，停止並準備下一個生成
-        if (peppaRight > 800) {
-            peppa.style.display = 'none'; // 隱藏佩佩豬
-            
-            // 清除本次移動循環
-            clearInterval(peppa.moveInterval); 
-
-            // 隨機生成下一個障礙物 (間隔1秒到3秒)
-            setTimeout(spawnPeppa, Math.random() * 2000 + 1000); 
+        if (obstacleRight > 800) {
+            obstacle.style.display = 'none'; 
+            clearInterval(obstacle.moveInterval); 
+            setTimeout(spawnObstacle, Math.random() * 2000 + 1000); 
         }
     };
     
-    // 開始移動障礙物
-    peppa.moveInterval = setInterval(movePeppa, 20); 
+    obstacle.moveInterval = setInterval(moveObstacle, 20); 
 }
 
 // --- 碰撞檢測 ---
 function checkCollision() {
-    // 獲取元素的位置和大小 (使用getBoundingClientRect更準確)
-    const ghostRect = ghost.getBoundingClientRect();
-    const peppaRect = peppa.getBoundingClientRect();
+    const playerRect = player.getBoundingClientRect();
+    const obstacleRect = obstacle.getBoundingClientRect();
 
-    // 檢測水平和垂直方向的重疊
     const horizontalOverlap = 
-        ghostRect.left < peppaRect.right &&
-        ghostRect.right > peppaRect.left;
+        playerRect.left < obstacleRect.right &&
+        playerRect.right > obstacleRect.left;
         
     const verticalOverlap = 
-        ghostRect.bottom > peppaRect.top &&
-        ghostRect.top < peppaRect.bottom;
+        playerRect.bottom > obstacleRect.top &&
+        playerRect.top < obstacleRect.bottom;
 
-    // 碰撞發生！
-    if (horizontalOverlap && verticalOverlap && peppa.style.display !== 'none') {
+    if (horizontalOverlap && verticalOverlap && obstacle.style.display !== 'none') {
         endGame();
     }
 }
@@ -121,6 +150,8 @@ function checkCollision() {
 // --- 遊戲循環 (主要邏輯) ---
 function gameLoop() {
     if (isGameOver) return;
+    applyPhysics();     // 處理跳躍和重力
+    applyMovement();    // 處理左右移動
     checkCollision();
 }
 
@@ -129,37 +160,56 @@ function gameLoop() {
 function endGame() {
     isGameOver = true;
     
-    // 停止所有計時器和循環
     clearInterval(timerInterval);
     clearInterval(gameLoopInterval);
-    if (peppa.moveInterval) {
-        clearInterval(peppa.moveInterval);
+    if (obstacle.moveInterval) {
+        clearInterval(obstacle.moveInterval);
     }
 
-    // 顯示遊戲結束訊息
     finalScore.textContent = score;
     gameOverMessage.classList.remove('hidden');
-
-    // 移除幽靈跳躍的class，防止動畫殘留
-    ghost.classList.remove('jump');
 }
 
 
-// --- 事件監聽器：空白鍵跳躍 ---
+// --- 事件監聽器：空白鍵跳躍，左右鍵移動 ---
 document.addEventListener('keydown', (event) => {
-    if (event.code === 'Space') {
-        if (isGameOver) {
-            startGame(); // 如果遊戲結束，按空白鍵重新開始
-        } else {
+    if (isGameOver && event.code === 'Space') {
+        startGame(); // 遊戲結束時按空白鍵重新開始
+        return;
+    }
+    
+    if (isGameOver) return;
+
+    switch (event.code) {
+        case 'Space':
             jump();
-        }
+            break;
+        case 'ArrowLeft':
+            isMovingLeft = true;
+            break;
+        case 'ArrowRight':
+            isMovingRight = true;
+            break;
     }
 });
+
+document.addEventListener('keyup', (event) => {
+    if (isGameOver) return;
+
+    switch (event.code) {
+        case 'ArrowLeft':
+            isMovingLeft = false;
+            break;
+        case 'ArrowRight':
+            isMovingRight = false;
+            break;
+    }
+});
+
 
 // 頁面載入時先初始化顯示遊戲結束畫面 (等待玩家開始)
 window.onload = () => {
     endGame();
-    // 預先移除隱藏 class，確保玩家能看到開始按鈕
     gameOverMessage.classList.remove('hidden'); 
-    finalScore.textContent = 0; // 初始分數為 0
+    finalScore.textContent = 0; 
 };
