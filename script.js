@@ -126,4 +126,115 @@ function spawnObstacle() {
     // 幽靈永遠在地面上 (bottom: 0px)
     obstacle.style.bottom = `${groundLevel}px`;
     
-    //
+    // 設置初始位置
+    obstacle.style.left = `${obstaclePosX}px`;
+    
+    // 隨機移動速度
+    const moveDuration = Math.random() * 3000 + 1000; // 1到4秒移動時間
+
+    // 使用 CSS Transition 來平滑移動 (只有左右移動)
+    obstacle.style.transition = `left ${moveDuration/1000}s linear`;
+    
+    // 延遲執行，設定目標位置
+    setTimeout(() => {
+        obstacle.style.left = `${targetX}px`;
+    }, 50);
+
+    // 在移動結束後，重新生成幽靈
+    setTimeout(() => {
+        // 清除過渡效果
+        obstacle.style.transition = 'none'; 
+        isObstacleActive = false;
+        obstacle.style.display = 'none';
+
+        // 隨機延遲後再次生成
+        setTimeout(spawnObstacle, Math.random() * 1500 + 1000);
+    }, moveDuration + 50); // 等待移動完成
+}
+
+// --- 碰撞檢測 (不變，它已經是判斷圖片框重疊) ---
+function checkCollision() {
+    if (obstacle.style.display === 'none') return;
+    
+    // 使用 getBoundingClientRect 獲取精確的邊界位置
+    const playerRect = player.getBoundingClientRect();
+    const obstacleRect = obstacle.getBoundingClientRect();
+
+    // 檢測水平和垂直方向的重疊
+    const horizontalOverlap = 
+        playerRect.left < obstacleRect.right &&
+        playerRect.right > obstacleRect.left;
+        
+    const verticalOverlap = 
+        playerRect.bottom > obstacleRect.top &&
+        playerRect.top < obstacleRect.bottom;
+
+    // 碰撞發生！
+    if (horizontalOverlap && verticalOverlap) {
+        endGame();
+    }
+}
+
+
+// --- 遊戲循環、結束、事件監聽器 (不變) ---
+function gameLoop() {
+    if (isGameOver) return;
+    applyPhysics();     
+    applyMovement();    
+    checkCollision();
+}
+
+
+function endGame() {
+    isGameOver = true;
+    
+    clearInterval(timerInterval);
+    clearInterval(gameLoopInterval);
+    isObstacleActive = false; 
+    obstacle.style.transition = 'none';
+
+    finalScore.textContent = score;
+    gameOverMessage.classList.remove('hidden');
+}
+
+
+document.addEventListener('keydown', (event) => {
+    if (isGameOver && event.code === 'Space') {
+        startGame(); 
+        return;
+    }
+    
+    if (isGameOver) return;
+
+    switch (event.code) {
+        case 'Space':
+            jump();
+            break;
+        case 'ArrowLeft':
+            isMovingLeft = true;
+            break;
+        case 'ArrowRight':
+            isMovingRight = true;
+            break;
+    }
+});
+
+document.addEventListener('keyup', (event) => {
+    if (isGameOver) return;
+
+    switch (event.code) {
+        case 'ArrowLeft':
+            isMovingLeft = false;
+            break;
+        case 'ArrowRight':
+            isMovingRight = false;
+            break;
+    }
+});
+
+
+window.onload = () => {
+    endGame();
+    gameOverMessage.classList.remove('hidden'); 
+    finalScore.textContent = 0; 
+};
