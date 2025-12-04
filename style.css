@@ -6,7 +6,7 @@ body {
     margin: 0;
     background-color: #f0f0f0;
     font-family: Arial, sans-serif;
-    overflow: hidden; /* 防止滾動條 */
+    overflow: hidden; 
 }
 
 #game-container {
@@ -15,7 +15,7 @@ body {
     border: 5px solid #333;
     background-color: #fff;
     position: relative;
-    overflow: hidden; /* 確保障礙物在邊界內 */
+    overflow: hidden; 
 }
 
 /* --- 得分顯示 --- */
@@ -29,40 +29,30 @@ body {
     z-index: 10;
 }
 
-/* --- 主角：小幽靈 --- */
-.ghost {
-    width: 60px; /* 圖片寬度 */
-    height: 60px; /* 圖片高度 */
-    background-image: url('pngtree-halloween-cartoon-spooky-elements-png-image_4054944.jpg'); /* 替換為您的第一張圖片名稱 */
+/* --- 主角：佩佩豬 --- */
+.peppa {
+    /* 使用您的第二張圖片作為主角 */
+    width: 60px; 
+    height: 60px; 
+    background-image: url('2v0dj1fh4ay61.jpg'); 
     background-size: cover;
     position: absolute;
     bottom: 0;
-    left: 50px;
-    transition: bottom 0.2s; /* 用於平滑跳躍 */
+    left: 50px; /* 初始位置在左側 */
     z-index: 5;
+    /* 移除 transition，因為 JS 會精確控制位置 */
 }
 
-/* 幽靈跳躍時添加的類別 */
-.jump {
-    animation: jump-animation 0.5s ease-out;
-}
-
-@keyframes jump-animation {
-    0% { bottom: 0; }
-    50% { bottom: 120px; } /* 跳躍高度 */
-    100% { bottom: 0; }
-}
-
-/* --- 障礙物：佩佩豬 --- */
-.peppa {
-    width: 60px; /* 圖片寬度 */
-    height: 60px; /* 圖片高度 */
-    background-image: url('2v0dj1fh4ay61.jpg'); /* 替換為您的第二張圖片名稱 */
+/* --- 障礙物：小幽靈 --- */
+.ghost {
+    /* 使用您的第一張圖片作為障礙物 */
+    width: 60px; 
+    height: 60px; 
+    background-image: url('pngtree-halloween-cartoon-spooky-elements-png-image_4054944.jpg'); 
     background-size: cover;
     position: absolute;
     bottom: 0;
     right: -60px; /* 從右邊界外開始 */
-    /* 障礙物的移動由JavaScript控制 */
 }
 
 /* --- 遊戲結束訊息 --- */
