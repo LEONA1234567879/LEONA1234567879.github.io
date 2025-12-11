@@ -4,7 +4,56 @@
     <meta charset="UTF-8">
     <title>📚 讀書監督員 V1.0</title>
     <style>
-        /* 簡單的 CSS 樣式讓介面看起來像個對話框 */
+        /* 新增的 CSS 樣式：模態視窗 */
+.modal-overlay {
+    display: flex; /* 預設顯示，讓它佔滿整個畫面 */
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.85); /* 半透明黑色背景 */
+    z-index: 1000; /* 確保它疊在所有東西上面 */
+}
+
+.modal-content {
+    background-color: #ffcdd2; /* 淺紅色背景，警告意味 */
+    padding: 40px;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+    max-width: 80%;
+    
+    /* 讓字體變大！ */
+    font-size: 1.5em; 
+    color: #b71c1c; /* 深紅色字體 */
+}
+
+.modal-content h1 {
+    font-size: 2.5em; /* 標題超大 */
+    margin-bottom: 20px;
+}
+
+#closeModalButton {
+    padding: 10px 20px;
+    margin-top: 20px;
+    font-size: 1.2em;
+    background-color: #ef5350;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+#closeModalButton:hover {
+    background-color: #e53935;
+}
+
+/* 當視窗關閉時隱藏它 */
+.modal-overlay.hidden {
+    display: none;
+}/* 簡單的 CSS 樣式讓介面看起來像個對話框 */
         body { font-family: Arial, sans-serif; background-color: #f4f4f9; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
         .chat-container { width: 400px; background: white; border-radius: 10px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); overflow: hidden; }
         .chat-header { background-color: #5c6bc0; color: white; padding: 15px; text-align: center; font-size: 1.2em; }
