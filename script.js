@@ -1,28 +1,8 @@
 // ====== 【新增部分：溫馨提示對話框】======
-
+window.onload = function() {
+    alert("溫馨提示: 玻璃心勿入 😈");
 };
-// ===========================================// 移除舊的 window.onload = function() { alert(...) };
-
-// 獲取 DOM 元素
-const chatBox = document.getElementById('chatBox');
-const userInput = document.getElementById('userInput');
-// 新增：獲取模態視窗元素
-const welcomeModal = document.getElementById('welcomeModal');
-const closeModalButton = document.getElementById('closeModalButton');
-
-
-// ====== 【新的模態視窗處理邏輯】======
-
-// 綁定按鈕事件：點擊「我已知曉」時關閉彈窗
-closeModalButton.onclick = function() {
-    welcomeModal.classList.add('hidden'); // 將彈窗隱藏
-};
-
 // ===========================================
-
-// 監督員的所有回覆句子 
-const responses = [
-// ... (後續程式碼保持不變)
 
 // 監督員的所有回覆句子
 const responses = [
