@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <title>📚 讀書監督員 V1.0</title>
+    <style>
+        /* 簡單的 CSS 樣式讓介面看起來像個對話框 */
+        body { font-family: Arial, sans-serif; background-color: #f4f4f9; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .chat-container { width: 400px; background: white; border-radius: 10px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); overflow: hidden; }
+        .chat-header { background-color: #5c6bc0; color: white; padding: 15px; text-align: center; font-size: 1.2em; }
+        .chat-box { height: 300px; padding: 10px; overflow-y: auto; border-bottom: 1px solid #eee; }
+        .message-input { display: flex; padding: 10px; }
+        .message-input input[type="text"] { flex-grow: 1; padding: 10px; border: 1px solid #ccc; border-radius: 5px 0 0 5px; }
+        .message-input button { padding: 10px 15px; background-color: #5c6bc0; color: white; border: none; border-radius: 0 5px 5px 0; cursor: pointer; }
+        .message-input button:hover { background-color: #3f51b5; }
+        /* 訊息氣泡樣式 */
+        .user-message { text-align: right; margin-bottom: 8px; }
+        .user-message span { background-color: #e0e7ff; padding: 8px; border-radius: 10px 10px 0 10px; display: inline-block; max-width: 80%; }
+        .supervisor-message { text-align: left; margin-bottom: 8px; }
+        .supervisor-message span { background-color: #ffccbc; padding: 8px; border-radius: 10px 10px 10px 0; display: inline-block; max-width: 80%; }
+    </style>
+</head>
+<body>
+
+<div class="chat-container">
+    <div class="chat-header">📚 讀書監督員</div>
+    <div class="chat-box" id="chatBox">
+        <div class="supervisor-message"><span>你還在發呆啊？輸入點什麼爛理由來面對現實吧。</span></div>
+    </div>
+    <div class="message-input">
+        <input type="text" id="userInput" placeholder="輸入你的進度/藉口..." onkeypress="if(event.keyCode==13) sendMessage()">
+        <button onclick="sendMessage()">送出</button>
+    </div>
+</div>
+
+<script src="script.js"></script> </body>
+</html>
